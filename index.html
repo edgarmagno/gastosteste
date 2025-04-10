@@ -1,23 +1,24 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GastoBot</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gasto Chat</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="top-bar">
-    <h1>GastoBot</h1>
+
+  <header>
+    <h1>💬 Gasto Chat</h1>
     <button id="darkModeToggle">🌙</button>
-  </div>
+  </header>
 
-  <div class="chat-container" id="chat"></div>
+  <main id="chat" class="chat-area"></main>
 
-  <form id="message-form">
-    <input type="text" id="message-input" placeholder="Digite + ou - seguido do valor e descrição..." required>
-    <button type="submit">Enviar</button>
-  </form>
+  <footer>
+    <input type="text" id="mensagem" placeholder="Digite seu ganho, gasto ou comando..." />
+    <button onclick="enviarMensagem()">Enviar</button>
+  </footer>
 
   <script src="script.js"></script>
 </body>
