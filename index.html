@@ -1,23 +1,28 @@
 <!DOCTYPE html>
-<html lang="pt-Br">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chat de Gastos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Finance Chat</title>
   <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="header">
-    <h1>Chat Financeiro</h1>
-    <button id="darkModeBtn">🌓</button>
+  <div class="app">
+    <header>
+      <h1>💬 Finance Chat</h1>
+      <div id="saldo">Saldo: R$ 0,00</div>
+    </header>
+    
+    <main id="chat"></main>
+    
+    <form id="form">
+      <input type="text" id="mensagem" placeholder="Ex: Ganhei 100 com freela..." required />
+      <button type="submit">Enviar</button>
+    </form>
+
+    <button id="reset">🗑 Limpar Histórico</button>
   </div>
-
-  <div id="chat" class="chat"></div>
-
-  <form id="chatForm" class="chat-form">
-    <input id="userInput" type="text" placeholder="Digite sua mensagem..." autocomplete="off" required />
-    <button type="submit">Enviar</button>
-  </form>
 
   <script src="script.js"></script>
 </body>
