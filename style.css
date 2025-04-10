@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
   font-family: Arial, sans-serif;
   margin: 0;
@@ -18,6 +22,11 @@ body {
   background: #007bff;
   color: white;
   padding: 10px 20px;
+}
+
+.top-bar h1 {
+  font-size: 18px;
+  margin: 0;
 }
 
 #darkModeToggle {
@@ -41,6 +50,7 @@ body {
   margin-bottom: 10px;
   padding: 10px;
   border-radius: 10px;
+  word-wrap: break-word;
 }
 
 .user {
@@ -80,16 +90,36 @@ form {
 #message-input {
   flex: 1;
   padding: 10px;
+  font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 5px;
 }
 
 button[type="submit"] {
-  padding: 10px 20px;
+  padding: 10px 15px;
   margin-left: 10px;
   border: none;
   background: #007bff;
   color: white;
   border-radius: 5px;
   cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .top-bar {
+    padding: 10px;
+  }
+
+  #message-input {
+    font-size: 14px;
+  }
+
+  .top-bar h1 {
+    font-size: 16px;
+  }
+
+  button[type="submit"] {
+    padding: 10px;
+    font-size: 14px;
+  }
 }
