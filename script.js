@@ -23,10 +23,34 @@ form.addEventListener('submit', async (e) => {
 
 function addMessage(remetente, texto) {
   const div = document.createElement('div');
-  div.className = remetente === 'Você' ? 'mensagem usuario' : 'mensagem bot';
-  div.textContent = `${remetente}: ${texto}`;
+  div.className = `mensagem ${remetente === 'Você' ? 'usuario' : 'bot'}`;
+
+  const avatar = document.createElement('img');
+  avatar.className = 'avatar';
+  avatar.src = remetente === 'Você'
+    ? 'https://i.imgur.com/HB1HLbN.png' // avatar usuário
+    : 'https://i.imgur.com/iqnqRYC.png'; // avatar bot
+
+  const content = document.createElement('div');
+  content.className = 'msg-content';
+
+  const header = document.createElement('div');
+  header.className = 'msg-header';
+  const hora = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  header.textContent = `${remetente} • ${hora}`;
+
+  const corpo = document.createElement('div');
+  corpo.textContent = texto;
+
+  content.appendChild(header);
+  content.appendChild(corpo);
+
+  div.appendChild(avatar);
+  div.appendChild(content);
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
+}
+
 }
 
 async function tratarLancamento(texto) {
