@@ -1,38 +1,45 @@
+const chatBox = document.getElementById('chat');
+const form = document.getElementById('chat-form');
+const input = document.getElementById('message-input');
 
-document.getElementById('send').addEventListener('click', sendMessage);
-document.getElementById('input').addEventListener('keypress', function (e) {
-  if (e.key === 'Enter') sendMessage();
-});
-document.getElementById('toggle-theme').addEventListener('click', () => {
-  document.body.classList.toggle('dark');
-});
+const scriptURL = 'https://script.google.com/macros/s/AKfycbw1hidJFgzn8hPEgM09GrUWsUHoXGFCG5ySKeEQdwrfP_38apCSfDfJYAxmNYpEXPCd/exec'; // Atualize aqui
 
-function appendMessage(text, className) {
-  const chat = document.getElementById('chat');
-  const messageDiv = document.createElement('div');
-  messageDiv.className = 'message ' + className;
-  messageDiv.textContent = text;
-  chat.appendChild(messageDiv);
-  chat.scrollTop = chat.scrollHeight;
-}
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const msg = input.value.trim();
+  if (!msg) return;
 
-async function sendMessage() {
-  const input = document.getElementById('input');
-  const message = input.value.trim();
-  if (!message) return;
-
-  appendMessage(message, 'user');
+  addMessage(msg, 'user');
   input.value = '';
 
+  const response = await sendToGoogleSheet(msg);
+  if (response && response.reply) {
+    addMessage(response.reply, 'bot');
+  } else {
+    addMessage("Erro ao se comunicar com a planilha!", 'bot');
+  }
+});
+
+function addMessage(text, sender) {
+  const msgEl = document.createElement('div');
+  msgEl.classList.add('message', sender);
+  msgEl.textContent = text;
+  chatBox.appendChild(msgEl);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+async function sendToGoogleSheet(message) {
   try {
-    const response = await fetch('AKfycbxV3NBRF2g-Is53qglDucuardscOARsk9IA7X2db_s13Jnf2rOl62XXmYz8-KpLOrw5', {
+    const res = await fetch(scriptURL, {
       method: 'POST',
-      body: JSON.stringify({ mensagem: message }),
-      headers: { 'Content-Type': 'application/json' }
+      body: JSON.stringify({ message }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
     });
-    const data = await response.json();
-    appendMessage(data.resposta, 'bot');
+    return await res.json();
   } catch (error) {
-    appendMessage('Erro ao conectar com o servidor.', 'bot');
+    console.error('Erro ao enviar:', error);
+    return null;
   }
 }
