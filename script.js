@@ -1,88 +1,51 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbw1hidJFgzn8hPEgM09GrUWsUHoXGFCG5ySKeEQdwrfP_38apCSfDfJYAxmNYpEXPCd/exec";
+// URL do Web App do Google Apps Script
+const scriptURL = "https://script.google.com/macros/s/AKfycbw1hidJFgzn8hPEgM09GrUWsUHoXGFCG5ySKeEQdwrfP_38apCSfDfJYAxmNYpEXPCd/exec";
 
-const chat = document.getElementById('chat');
-const form = document.getElementById('message-form');
-const input = document.getElementById('message-input');
-const toggle = document.getElementById('darkModeToggle');
-
-toggle.addEventListener('click', () => {
-  document.body.classList.toggle('dark');
-});
-
-form.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const msg = input.value.trim();
-  if (!msg) return;
-
-  adicionarMensagem('user', msg);
-  interpretarMensagem(msg);
-  input.value = '';
-});
-
-function adicionarMensagem(remetente, texto) {
-  const div = document.createElement('div');
-  div.className = `message ${remetente}`;
-  div.textContent = texto;
-  chat.appendChild(div);
+// Função para adicionar uma nova mensagem ao chat
+function adicionarMensagem(origem, texto) {
+  const chat = document.getElementById("chat");
+  const msg = document.createElement("div");
+  msg.className = origem === "Você" ? "mensagem usuario" : "mensagem bot";
+  msg.innerText = `${origem}: ${texto}`;
+  chat.appendChild(msg);
   chat.scrollTop = chat.scrollHeight;
 }
 
-function interpretarMensagem(msg) {
-  const valorRegex = /^([\+\-])\s*(\d+(?:[,.]\d{1,2})?)\s*(.*)$/i;
-  const relatorioRegex = /relatorio (hoje|semana|mes)/i;
+// Envia a mensagem para o servidor e trata a resposta
+async function enviarMensagem() {
+  const input = document.getElementById("mensagem");
+  const texto = input.value.trim();
+  if (texto === "") return;
 
-  if (valorRegex.test(msg)) {
-    const [, sinal, valorStr, descricao] = msg.match(valorRegex);
-    const valor = parseFloat(valorStr.replace(',', '.'));
-    const tipo = sinal === '+' ? 'ganho' : 'gasto';
+  adicionarMensagem("Você", texto);
+  input.value = "";
 
-    fetch(API_URL, {
-      method: 'POST',
-      body: JSON.stringify({
-        tipo: 'inserir',
-        categoria: tipo,
-        valor,
-        descricao
-      })
-    }).then(res => res.text())
-      .then(res => adicionarMensagem('bot', '✅ ' + res));
+  try {
+    const resposta = await fetch(scriptURL, {
+      method: "POST",
+      body: JSON.stringify({ mensagem: texto }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-    return;
+    const dados = await resposta.json();
+    adicionarMensagem("Bot", dados.resposta);
+  } catch (error) {
+    adicionarMensagem("Bot", "❌ Erro ao enviar mensagem. Verifique sua conexão.");
+    console.error("Erro:", error);
   }
-
-  const matchRelatorio = msg.match(relatorioRegex);
-  if (matchRelatorio) {
-    const periodo = matchRelatorio[1];
-
-    fetch(API_URL, {
-      method: 'POST',
-      body: JSON.stringify({
-        tipo: 'relatorio',
-        periodo
-      })
-    }).then(res => res.json())
-      .then(dados => {
-        let texto = `📊 Relatório ${periodo}:
-
-`;
-
-        texto += `💰 Ganhos:
-`;
-        for (let [k, v] of Object.entries(dados.ganhos)) {
-          texto += `• ${k}: R$ ${v.toFixed(2)}\n`;
-        }
-
-        texto += `\n💸 Gastos:\n`;
-        for (let [k, v] of Object.entries(dados.gastos)) {
-          texto += `• ${k}: R$ ${v.toFixed(2)}\n`;
-        }
-
-        texto += `\n📈 Total: +R$ ${dados.totalGanhos.toFixed(2)} | -R$ ${dados.totalGastos.toFixed(2)}`;
-        adicionarMensagem('bot', texto);
-      });
-
-    return;
-  }
-
-  adicionarMensagem('bot', '🤖 Comando não reconhecido. Use:\n+ 200 descrição\n- 100 descrição\nrelatorio hoje|semana|mes');
 }
+
+// Atalho para enviar com Enter
+document.getElementById("mensagem").addEventListener("keypress", function (e) {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    enviarMensagem();
+  }
+});
+
+// Botão de modo escuro/claro
+document.getElementById("darkModeToggle").addEventListener("click", () => {
+  document.body.classList.toggle("dark-mode");
+});
