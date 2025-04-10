@@ -1,46 +1,61 @@
-const scriptURL = "https://script.google.com/macros/s/AKfycbw1hidJFgzn8hPEgM09GrUWsUHoXGFCG5ySKeEQdwrfP_38apCSfDfJYAxmNYpEXPCd/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbw1hidJFgzn8hPEgM09GrUWsUHoXGFCG5ySKeEQdwrfP_38apCSfDfJYAxmNYpEXPCd/exec";
 
-function adicionarMensagem(origem, texto) {
-  const chat = document.getElementById("chat");
-  const msg = document.createElement("div");
-  msg.className = origem === "Você" ? "mensagem usuario" : "mensagem bot";
-  msg.innerText = `${origem}: ${texto}`;
-  chat.appendChild(msg);
-  chat.scrollTop = chat.scrollHeight;
+const chatContainer = document.getElementById('chatContainer');
+const inputMessage = document.getElementById('inputMessage');
+const sendButton = document.getElementById('sendButton');
+
+// Função para adicionar uma nova mensagem ao chat
+function adicionarMensagem(usuario, mensagem) {
+  const mensagemContainer = document.createElement('div');
+  mensagemContainer.classList.add('mensagem');
+  mensagemContainer.classList.add(usuario === 'Você' ? 'mensagem-enviada' : 'mensagem-recebida');
+  mensagemContainer.innerText = `${usuario}: ${mensagem}`;
+  chatContainer.appendChild(mensagemContainer);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
-async function enviarMensagem() {
-  const input = document.getElementById("mensagem");
-  const texto = input.value.trim();
-  if (texto === "") return;
-
-  adicionarMensagem("Você", texto);
-  input.value = "";
+// Função para enviar a mensagem ao servidor
+async function enviarMensagem(mensagem) {
+  adicionarMensagem("Você", mensagem);
 
   try {
-    const resposta = await fetch(scriptURL, {
+    const resposta = await fetch(API_URL, {
       method: "POST",
-      body: JSON.stringify({ mensagem: texto }),
+      body: JSON.stringify({ mensagem }),
       headers: {
-        "Content-Type": "application/json",
-      },
+        "Content-Type": "application/json"
+      }
     });
 
     const dados = await resposta.json();
-    adicionarMensagem("Bot", dados.resposta);
-  } catch (error) {
-    adicionarMensagem("Bot", "❌ Erro ao enviar mensagem. Verifique sua conexão.");
-    console.error("Erro:", error);
+
+    if (dados && dados.resposta) {
+      adicionarMensagem("Bot", dados.resposta);
+    } else {
+      adicionarMensagem("Bot", "❌ Resposta inválida do servidor.");
+    }
+
+  } catch (e) {
+    adicionarMensagem("Bot", "❌ Erro ao enviar mensagem. Verifique sua conexão ou a URL da API.");
   }
 }
 
-document.getElementById("mensagem").addEventListener("keypress", function (e) {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    enviarMensagem();
+// Enviar mensagem ao clicar no botão
+sendButton.addEventListener('click', () => {
+  const mensagem = inputMessage.value.trim();
+  if (mensagem) {
+    inputMessage.value = '';
+    enviarMensagem(mensagem);
   }
 });
 
-document.getElementById("darkModeToggle").addEventListener("click", () => {
-  document.body.classList.toggle("dark-mode");
+// Enviar mensagem ao pressionar Enter
+inputMessage.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    const mensagem = inputMessage.value.trim();
+    if (mensagem) {
+      inputMessage.value = '';
+      enviarMensagem(mensagem);
+    }
+  }
 });
