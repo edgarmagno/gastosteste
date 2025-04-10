@@ -1,61 +1,41 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbw1hidJFgzn8hPEgM09GrUWsUHoXGFCG5ySKeEQdwrfP_38apCSfDfJYAxmNYpEXPCd/exec";
 
-const chatContainer = document.getElementById('chatContainer');
-const inputMessage = document.getElementById('inputMessage');
-const sendButton = document.getElementById('sendButton');
+const chatContainer = document.getElementById("chat");
+const input = document.getElementById("userInput");
+const form = document.getElementById("chatForm");
+const darkModeBtn = document.getElementById("darkModeBtn");
 
-// Função para adicionar uma nova mensagem ao chat
-function adicionarMensagem(usuario, mensagem) {
-  const mensagemContainer = document.createElement('div');
-  mensagemContainer.classList.add('mensagem');
-  mensagemContainer.classList.add(usuario === 'Você' ? 'mensagem-enviada' : 'mensagem-recebida');
-  mensagemContainer.innerText = `${usuario}: ${mensagem}`;
-  chatContainer.appendChild(mensagemContainer);
+function addMessage(text, sender) {
+  const message = document.createElement("div");
+  message.className = `message ${sender}`;
+  message.textContent = text;
+  chatContainer.appendChild(message);
   chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
-// Função para enviar a mensagem ao servidor
-async function enviarMensagem(mensagem) {
-  adicionarMensagem("Você", mensagem);
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const userMessage = input.value.trim();
+  if (!userMessage) return;
+
+  addMessage(userMessage, "user");
+  input.value = "";
 
   try {
-    const resposta = await fetch(API_URL, {
+    const response = await fetch(API_URL, {
       method: "POST",
-      body: JSON.stringify({ mensagem }),
-      headers: {
-        "Content-Type": "application/json"
-      }
+      body: JSON.stringify({ mensagem: userMessage }),
+      headers: { "Content-Type": "application/json" },
     });
 
-    const dados = await resposta.json();
-
-    if (dados && dados.resposta) {
-      adicionarMensagem("Bot", dados.resposta);
-    } else {
-      adicionarMensagem("Bot", "❌ Resposta inválida do servidor.");
-    }
-
-  } catch (e) {
-    adicionarMensagem("Bot", "❌ Erro ao enviar mensagem. Verifique sua conexão ou a URL da API.");
-  }
-}
-
-// Enviar mensagem ao clicar no botão
-sendButton.addEventListener('click', () => {
-  const mensagem = inputMessage.value.trim();
-  if (mensagem) {
-    inputMessage.value = '';
-    enviarMensagem(mensagem);
+    const data = await response.json();
+    addMessage(data.resposta || "⚠️ Sem resposta do servidor.", "bot");
+  } catch (error) {
+    addMessage("❌ Erro ao enviar mensagem. Verifique sua conexão.", "bot");
   }
 });
 
-// Enviar mensagem ao pressionar Enter
-inputMessage.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') {
-    const mensagem = inputMessage.value.trim();
-    if (mensagem) {
-      inputMessage.value = '';
-      enviarMensagem(mensagem);
-    }
-  }
+// Dark Mode Toggle
+darkModeBtn.addEventListener("click", () => {
+  document.body.classList.toggle("dark-mode");
 });
