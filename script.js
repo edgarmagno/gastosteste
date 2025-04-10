@@ -4,32 +4,7 @@ const chat = document.getElementById("chat");
 const saldo = document.getElementById("saldo");
 const reset = document.getElementById("reset");
 
-let historico = JSON.parse(localStorage.getItem("chatFinance")) || [];
-
-function atualizarInterface() {
-  chat.innerHTML = "";
-  let total = 0;
-
-  historico.forEach((item) => {
-    const div = document.createElement("div");
-    div.classList.add("bolha");
-
-    const valor = extrairValor(item);
-    if (valor > 0) {
-      div.classList.add("ganho");
-      total += valor;
-    } else {
-      div.classList.add("gasto");
-      total += valor;
-    }
-
-    div.textContent = item;
-    chat.appendChild(div);
-  });
-
-  saldo.textContent = `Saldo: R$ ${total.toFixed(2)}`;
-  localStorage.setItem("chatFinance", JSON.stringify(historico));
-}
+const API_URL = "https://script.google.com/macros/s/AKfycbwp9Axbob5zgRZXCIYXNUXeMzzHyqsaO-lAgSPQaAmMjPZjTu4Zj-fGhQRWHKqd9x0Z/exec";
 
 function extrairValor(texto) {
   const regex = /-?\d+(,\d{2})?/g;
@@ -39,21 +14,51 @@ function extrairValor(texto) {
   return texto.toLowerCase().includes("gastei") || texto.includes("-") ? -parseFloat(valor) : parseFloat(valor);
 }
 
-form.addEventListener("submit", (e) => {
+async function carregarMensagens() {
+  const res = await fetch(API_URL);
+  const data = await res.json();
+  let total = 0;
+
+  chat.innerHTML = "";
+
+  data.forEach(({ texto, valor }) => {
+    const div = document.createElement("div");
+    div.classList.add("bolha");
+
+    if (valor > 0) {
+      div.classList.add("ganho");
+    } else {
+      div.classList.add("gasto");
+    }
+
+    total += Number(valor);
+    div.textContent = texto;
+    chat.appendChild(div);
+  });
+
+  saldo.textContent = `Saldo: R$ ${total.toFixed(2)}`;
+}
+
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
   const texto = mensagem.value.trim();
-  if (texto === "") return;
+  if (!texto) return;
 
-  historico.push(texto);
+  const valor = extrairValor(texto);
+  await fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify({ texto, valor }),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
+
   mensagem.value = "";
-  atualizarInterface();
+  carregarMensagens();
 });
 
 reset.addEventListener("click", () => {
-  if (confirm("Deseja limpar o histórico?")) {
-    historico = [];
-    atualizarInterface();
-  }
+  alert("Limpeza do histórico precisa ser feita direto na planilha.");
 });
 
-atualizarInterface();
+carregarMensagens();
