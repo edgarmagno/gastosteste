@@ -1,113 +1,88 @@
-const scriptURL = 'https://script.google.com/macros/s/AKfycbw1hidJFgzn8hPEgM09GrUWsUHoXGFCG5ySKeEQdwrfP_38apCSfDfJYAxmNYpEXPCd/exec'; // substitua pela URL do seu script
+const API_URL = "https://script.google.com/macros/s/AKfycbw1hidJFgzn8hPEgM09GrUWsUHoXGFCG5ySKeEQdwrfP_38apCSfDfJYAxmNYpEXPCd/exec";
 
 const chat = document.getElementById('chat');
-const input = document.getElementById('input');
-const form = document.getElementById('form');
+const form = document.getElementById('message-form');
+const input = document.getElementById('message-input');
+const toggle = document.getElementById('darkModeToggle');
 
-form.addEventListener('submit', async (e) => {
+toggle.addEventListener('click', () => {
+  document.body.classList.toggle('dark');
+});
+
+form.addEventListener('submit', (e) => {
   e.preventDefault();
   const msg = input.value.trim();
   if (!msg) return;
 
-  addMessage('Você', msg);
+  adicionarMensagem('user', msg);
+  interpretarMensagem(msg);
   input.value = '';
-
-  if (msg.toLowerCase().startsWith('gastei') || msg.toLowerCase().startsWith('ganhei')) {
-    await tratarLancamento(msg);
-  } else if (msg.toLowerCase().includes('relatório')) {
-    await gerarRelatorio(msg);
-  } else {
-    addMessage('Assistente', 'Desculpe, não entendi. Tente: "gastei 20 com lanche", "ganhei 300 de salário", "relatório semanal"...');
-  }
 });
 
-function addMessage(remetente, texto) {
+function adicionarMensagem(remetente, texto) {
   const div = document.createElement('div');
-  div.className = `mensagem ${remetente === 'Você' ? 'usuario' : 'bot'}`;
-
-  const avatar = document.createElement('img');
-  avatar.className = 'avatar';
-  avatar.src = remetente === 'Você'
-    ? 'https://i.imgur.com/HB1HLbN.png' // avatar usuário
-    : 'https://i.imgur.com/iqnqRYC.png'; // avatar bot
-
-  const content = document.createElement('div');
-  content.className = 'msg-content';
-
-  const header = document.createElement('div');
-  header.className = 'msg-header';
-  const hora = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  header.textContent = `${remetente} • ${hora}`;
-
-  const corpo = document.createElement('div');
-  corpo.textContent = texto;
-
-  content.appendChild(header);
-  content.appendChild(corpo);
-
-  div.appendChild(avatar);
-  div.appendChild(content);
+  div.className = `message ${remetente}`;
+  div.textContent = texto;
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
 }
 
-}
+function interpretarMensagem(msg) {
+  const valorRegex = /^([\+\-])\s*(\d+(?:[,.]\d{1,2})?)\s*(.*)$/i;
+  const relatorioRegex = /relatorio (hoje|semana|mes)/i;
 
-async function tratarLancamento(texto) {
-  const tipo = texto.toLowerCase().startsWith('gastei') ? 'Gasto' : 'Ganho';
-  const regex = /(gastei|ganhei)\s+(\d+(?:[.,]\d{1,2})?)\s+com\s+(.+)/i;
-  const match = texto.match(regex);
+  if (valorRegex.test(msg)) {
+    const [, sinal, valorStr, descricao] = msg.match(valorRegex);
+    const valor = parseFloat(valorStr.replace(',', '.'));
+    const tipo = sinal === '+' ? 'ganho' : 'gasto';
 
-  if (!match) {
-    addMessage('Assistente', 'Por favor use: "gastei 50 com mercado" ou "ganhei 200 com vendas"');
+    fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        tipo: 'inserir',
+        categoria: tipo,
+        valor,
+        descricao
+      })
+    }).then(res => res.text())
+      .then(res => adicionarMensagem('bot', '✅ ' + res));
+
     return;
   }
 
-  const valor = parseFloat(match[2].replace(',', '.'));
-  const descricao = match[3];
-  const data = new Date().toLocaleDateString('pt-BR');
+  const matchRelatorio = msg.match(relatorioRegex);
+  if (matchRelatorio) {
+    const periodo = matchRelatorio[1];
 
-  const dados = { data, tipo, valor, descricao };
-
-  try {
-    const res = await fetch(scriptURL, {
+    fetch(API_URL, {
       method: 'POST',
-      body: new URLSearchParams(dados)
-    });
+      body: JSON.stringify({
+        tipo: 'relatorio',
+        periodo
+      })
+    }).then(res => res.json())
+      .then(dados => {
+        let texto = `📊 Relatório ${periodo}:
 
-    if (res.ok) {
-      addMessage('Assistente', `${tipo} de R$${valor.toFixed(2)} registrado: ${descricao}`);
-    } else {
-      addMessage('Assistente', 'Erro ao salvar. Tente novamente.');
-    }
-  } catch (error) {
-    addMessage('Assistente', 'Erro de conexão.');
+`;
+
+        texto += `💰 Ganhos:
+`;
+        for (let [k, v] of Object.entries(dados.ganhos)) {
+          texto += `• ${k}: R$ ${v.toFixed(2)}\n`;
+        }
+
+        texto += `\n💸 Gastos:\n`;
+        for (let [k, v] of Object.entries(dados.gastos)) {
+          texto += `• ${k}: R$ ${v.toFixed(2)}\n`;
+        }
+
+        texto += `\n📈 Total: +R$ ${dados.totalGanhos.toFixed(2)} | -R$ ${dados.totalGastos.toFixed(2)}`;
+        adicionarMensagem('bot', texto);
+      });
+
+    return;
   }
-}
 
-async function gerarRelatorio(texto) {
-  let periodo = 'diario';
-  if (texto.includes('semanal')) periodo = 'semanal';
-  else if (texto.includes('mensal')) periodo = 'mensal';
-
-  try {
-    const res = await fetch(`${scriptURL}?relatorio=${periodo}`);
-    const dados = await res.json();
-
-    let resposta = `📊 Relatório ${periodo}:\n\n`;
-    resposta += `💰 Ganhos: R$ ${dados.ganhos.toFixed(2)}\n`;
-    resposta += `💸 Gastos: R$ ${dados.gastos.toFixed(2)}\n`;
-    resposta += `🧮 Saldo: R$ ${(dados.ganhos - dados.gastos).toFixed(2)}\n`;
-
-    if (dados.porTipo) {
-      resposta += `\n🔍 Por tipo:\n`;
-      for (const tipo in dados.porTipo) {
-        resposta += `• ${tipo}: R$ ${dados.porTipo[tipo].toFixed(2)}\n`;
-      }
-    }
-
-    addMessage('Assistente', resposta);
-  } catch (err) {
-    addMessage('Assistente', 'Erro ao gerar relatório.');
-  }
+  adicionarMensagem('bot', '🤖 Comando não reconhecido. Use:\n+ 200 descrição\n- 100 descrição\nrelatorio hoje|semana|mes');
 }
