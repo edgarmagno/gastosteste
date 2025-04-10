@@ -1,22 +1,17 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Assistente Financeiro</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Financeiro</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="chat-container">
-    <header>
-      <span>Assistente Financeiro</span>
-      <button id="toggle-theme">🌙</button>
-    </header>
-    <div id="chat"></div>
-    <div id="input-container">
-      <input type="text" id="input" placeholder="Digite uma mensagem...">
-      <button id="send">➤</button>
-    </div>
+  <div class="chat-container">
+    <div id="chat" class="chat-box"></div>
+    <form id="chat-form">
+      <input type="text" id="message-input" placeholder="Digite sua mensagem..." autocomplete="off">
+      <button type="submit">Enviar</button>
+    </form>
   </div>
   <script src="script.js"></script>
 </body>
