@@ -1,7 +1,5 @@
-// URL do Web App do Google Apps Script
 const scriptURL = "https://script.google.com/macros/s/AKfycbw1hidJFgzn8hPEgM09GrUWsUHoXGFCG5ySKeEQdwrfP_38apCSfDfJYAxmNYpEXPCd/exec";
 
-// Função para adicionar uma nova mensagem ao chat
 function adicionarMensagem(origem, texto) {
   const chat = document.getElementById("chat");
   const msg = document.createElement("div");
@@ -11,7 +9,6 @@ function adicionarMensagem(origem, texto) {
   chat.scrollTop = chat.scrollHeight;
 }
 
-// Envia a mensagem para o servidor e trata a resposta
 async function enviarMensagem() {
   const input = document.getElementById("mensagem");
   const texto = input.value.trim();
@@ -37,7 +34,6 @@ async function enviarMensagem() {
   }
 }
 
-// Atalho para enviar com Enter
 document.getElementById("mensagem").addEventListener("keypress", function (e) {
   if (e.key === "Enter") {
     e.preventDefault();
@@ -45,7 +41,6 @@ document.getElementById("mensagem").addEventListener("keypress", function (e) {
   }
 });
 
-// Botão de modo escuro/claro
 document.getElementById("darkModeToggle").addEventListener("click", () => {
   document.body.classList.toggle("dark-mode");
 });
