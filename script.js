@@ -1,4 +1,4 @@
-const scriptURL = "https://script.google.com/macros/s/17Uuf9iywDSK8BOgbS4CjVrVdN00sB50Cbi0W19JIF4LeklCcyay1sBle/exec";
+const scriptURL = "https://script.google.com/macros/s/AKfycbyR9GzrX7MxLeU6LHjZY1e7sNWueyrGfUkp-nmA9Sw/exec";
 
 function adicionarMensagem(origem, texto) {
   const chat = document.getElementById("chat");
