@@ -25,7 +25,7 @@ async function sendMessage() {
   input.value = '';
 
   try {
-    const response = await fetch('https://script.google.com/macros/s/SEU_WEBAPP_URL/exec', {
+    const response = await fetch('AKfycbxV3NBRF2g-Is53qglDucuardscOARsk9IA7X2db_s13Jnf2rOl62XXmYz8-KpLOrw5', {
       method: 'POST',
       body: JSON.stringify({ mensagem: message }),
       headers: { 'Content-Type': 'application/json' }
