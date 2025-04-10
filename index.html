@@ -2,21 +2,22 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Chat Financeiro</title>
+  <title>GastoBot</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto&display=swap">
-
 </head>
 <body>
-  <div class="chat-container">
-    <div id="chat"></div>
-
-<form id="form">
-  <input type="text" id="input" placeholder="Digite aqui...">
-  <button type="submit">Enviar</button>
-</form>
+  <div class="top-bar">
+    <h1>GastoBot</h1>
+    <button id="darkModeToggle">🌙</button>
   </div>
+
+  <div class="chat-container" id="chat"></div>
+
+  <form id="message-form">
+    <input type="text" id="message-input" placeholder="Digite + ou - seguido do valor e descrição..." required>
+    <button type="submit">Enviar</button>
+  </form>
+
   <script src="script.js"></script>
 </body>
 </html>
