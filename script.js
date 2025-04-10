@@ -1,41 +1,59 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbw1hidJFgzn8hPEgM09GrUWsUHoXGFCG5ySKeEQdwrfP_38apCSfDfJYAxmNYpEXPCd/exec";
+const form = document.getElementById("form");
+const mensagem = document.getElementById("mensagem");
+const chat = document.getElementById("chat");
+const saldo = document.getElementById("saldo");
+const reset = document.getElementById("reset");
 
-const chatContainer = document.getElementById("chat");
-const input = document.getElementById("userInput");
-const form = document.getElementById("chatForm");
-const darkModeBtn = document.getElementById("darkModeBtn");
+let historico = JSON.parse(localStorage.getItem("chatFinance")) || [];
 
-function addMessage(text, sender) {
-  const message = document.createElement("div");
-  message.className = `message ${sender}`;
-  message.textContent = text;
-  chatContainer.appendChild(message);
-  chatContainer.scrollTop = chatContainer.scrollHeight;
+function atualizarInterface() {
+  chat.innerHTML = "";
+  let total = 0;
+
+  historico.forEach((item) => {
+    const div = document.createElement("div");
+    div.classList.add("bolha");
+
+    const valor = extrairValor(item);
+    if (valor > 0) {
+      div.classList.add("ganho");
+      total += valor;
+    } else {
+      div.classList.add("gasto");
+      total += valor;
+    }
+
+    div.textContent = item;
+    chat.appendChild(div);
+  });
+
+  saldo.textContent = `Saldo: R$ ${total.toFixed(2)}`;
+  localStorage.setItem("chatFinance", JSON.stringify(historico));
 }
 
-form.addEventListener("submit", async (e) => {
+function extrairValor(texto) {
+  const regex = /-?\d+(,\d{2})?/g;
+  const encontrado = texto.match(regex);
+  if (!encontrado) return 0;
+  let valor = encontrado[0].replace(",", ".");
+  return texto.toLowerCase().includes("gastei") || texto.includes("-") ? -parseFloat(valor) : parseFloat(valor);
+}
+
+form.addEventListener("submit", (e) => {
   e.preventDefault();
-  const userMessage = input.value.trim();
-  if (!userMessage) return;
+  const texto = mensagem.value.trim();
+  if (texto === "") return;
 
-  addMessage(userMessage, "user");
-  input.value = "";
+  historico.push(texto);
+  mensagem.value = "";
+  atualizarInterface();
+});
 
-  try {
-    const response = await fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify({ mensagem: userMessage }),
-      headers: { "Content-Type": "application/json" },
-    });
-
-    const data = await response.json();
-    addMessage(data.resposta || "⚠️ Sem resposta do servidor.", "bot");
-  } catch (error) {
-    addMessage("❌ Erro ao enviar mensagem. Verifique sua conexão.", "bot");
+reset.addEventListener("click", () => {
+  if (confirm("Deseja limpar o histórico?")) {
+    historico = [];
+    atualizarInterface();
   }
 });
 
-// Dark Mode Toggle
-darkModeBtn.addEventListener("click", () => {
-  document.body.classList.toggle("dark-mode");
-});
+atualizarInterface();
