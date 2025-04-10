@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbw1hidJFgzn8hPEgM09GrUWsUHoXGFCG5ySKeEQdwrfP_38apCSfDfJYAxmNYpEXPCd/exec";
+const API_URL = "https://script.google.com/macros/s/1DD8KWdqHsQIHBEUtYDZWy8wgrgZkVp82nNPm5qqZxz8/exec";
 
 const chatContainer = document.getElementById('chatContainer');
 const inputMessage = document.getElementById('inputMessage');
