@@ -2,7 +2,6 @@ const form = document.getElementById("form");
 const mensagem = document.getElementById("mensagem");
 const chat = document.getElementById("chat");
 const saldo = document.getElementById("saldo");
-const reset = document.getElementById("reset");
 
 const API_URL = "https://script.google.com/macros/s/AKfycbwp9Axbob5zgRZXCIYXNUXeMzzHyqsaO-lAgSPQaAmMjPZjTu4Zj-fGhQRWHKqd9x0Z/exec";
 
@@ -37,6 +36,7 @@ async function carregarMensagens() {
   });
 
   saldo.textContent = `Saldo: R$ ${total.toFixed(2)}`;
+  chat.scrollTop = chat.scrollHeight;
 }
 
 form.addEventListener("submit", async (e) => {
@@ -57,8 +57,5 @@ form.addEventListener("submit", async (e) => {
   carregarMensagens();
 });
 
-reset.addEventListener("click", () => {
-  alert("Limpeza do histórico precisa ser feita direto na planilha.");
-});
-
 carregarMensagens();
+
