@@ -1,7 +1,17 @@
+:root {
+  --bg-color: #121212;
+  --user-msg: #DCF8C6;
+  --bot-msg: #2A2F32;
+  --text-light: #ffffff;
+  --text-dark: #000000;
+  --accent: #25D366;
+}
+
 body {
   margin: 0;
   font-family: 'Roboto', sans-serif;
-  background-color: #f1f1f1;
+  background-color: var(--bg-color);
+  color: var(--text-light);
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -13,6 +23,8 @@ header {
   padding: 1rem;
   text-align: center;
   font-size: 1.2rem;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 #chat {
@@ -21,53 +33,81 @@ header {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1rem;
 }
 
 .mensagem {
-  max-width: 75%;
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  max-width: 80%;
+}
+
+.msg-content {
   padding: 0.75rem 1rem;
   border-radius: 15px;
   font-size: 0.95rem;
   line-height: 1.4;
   position: relative;
   word-wrap: break-word;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.msg-header {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  margin-bottom: 2px;
 }
 
 .usuario {
   align-self: flex-end;
-  background-color: #DCF8C6;
-  color: #303030;
+  flex-direction: row-reverse;
+}
+
+.usuario .msg-content {
+  background-color: var(--user-msg);
+  color: var(--text-dark);
   border-bottom-right-radius: 0;
 }
 
 .bot {
   align-self: flex-start;
-  background-color: #FFFFFF;
-  color: #000;
+}
+
+.bot .msg-content {
+  background-color: var(--bot-msg);
+  color: var(--text-light);
   border-bottom-left-radius: 0;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 form {
   display: flex;
   padding: 0.75rem;
-  background-color: #fff;
-  border-top: 1px solid #ccc;
+  background-color: #1F1F1F;
+  border-top: 1px solid #333;
 }
 
 input[type="text"] {
   flex: 1;
   padding: 0.75rem 1rem;
   font-size: 1rem;
-  border: 1px solid #ccc;
+  border: 1px solid #444;
+  background-color: #2a2a2a;
+  color: white;
   border-radius: 25px;
   outline: none;
 }
 
 button {
   margin-left: 0.75rem;
-  background-color: #128C7E;
+  background-color: var(--accent);
   border: none;
   border-radius: 25px;
   padding: 0 1.25rem;
@@ -78,5 +118,5 @@ button {
 }
 
 button:hover {
-  background-color: #0d6e60;
+  background-color: #1ebe5d;
 }
