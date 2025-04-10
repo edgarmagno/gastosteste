@@ -1,67 +1,82 @@
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f1f1f1;
+  font-family: 'Roboto', sans-serif;
+  background-color: #f1f1f1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
 
-.chat-container {
-  max-width: 500px;
-  margin: 50px auto;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  overflow: hidden;
+header {
+  background-color: #075E54;
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  font-size: 1.2rem;
 }
 
-.chat-box {
-  height: 500px;
-  padding: 20px;
+#chat {
+  flex: 1;
+  padding: 1rem;
   overflow-y: auto;
-  border-bottom: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.message {
-  margin: 10px 0;
-  padding: 10px;
-  border-radius: 5px;
-  max-width: 80%;
+.mensagem {
+  max-width: 75%;
+  padding: 0.75rem 1rem;
+  border-radius: 15px;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  position: relative;
+  word-wrap: break-word;
 }
 
-.user {
-  background: #dcf8c6;
+.usuario {
   align-self: flex-end;
-  text-align: right;
-  margin-left: auto;
+  background-color: #DCF8C6;
+  color: #303030;
+  border-bottom-right-radius: 0;
 }
 
 .bot {
-  background: #ececec;
   align-self: flex-start;
-  text-align: left;
-  margin-right: auto;
+  background-color: #FFFFFF;
+  color: #000;
+  border-bottom-left-radius: 0;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
-#chat-form {
+form {
   display: flex;
-  border-top: 1px solid #ddd;
+  padding: 0.75rem;
+  background-color: #fff;
+  border-top: 1px solid #ccc;
 }
 
-#message-input {
+input[type="text"] {
   flex: 1;
-  padding: 15px;
-  border: none;
-  font-size: 16px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 25px;
+  outline: none;
 }
 
 button {
-  padding: 15px;
+  margin-left: 0.75rem;
+  background-color: #128C7E;
   border: none;
-  background: #4caf50;
+  border-radius: 25px;
+  padding: 0 1.25rem;
   color: white;
+  font-weight: bold;
   cursor: pointer;
-  font-size: 16px;
+  transition: background-color 0.2s;
 }
 
 button:hover {
-  background: #45a049;
+  background-color: #0d6e60;
 }
